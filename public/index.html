@@ -48,13 +48,74 @@
         .modal {
             transition: opacity 0.3s ease;
         }
+
+        .placeholder-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #5D5CDE;
+            color: white;
+            font-weight: bold;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.25rem;
+        }
+        
+        .provider-badge {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            margin-left: 0.5rem;
+        }
+        
+        .provider-google-drive {
+            background-color: #4285F4;
+            color: white;
+        }
+        
+        .provider-dropbox {
+            background-color: #0061FF;
+            color: white;
+        }
+        
+        .provider-onedrive {
+            background-color: #0078D4;
+            color: white;
+        }
+        
+        .provider-mega {
+            background-color: #D9272E;
+            color: white;
+        }
+        
+        .provider-mediafire {
+            background-color: #1299F3;
+            color: white;
+        }
+        
+        .provider-modsfire {
+            background-color: #FF6B35;
+            color: white;
+        }
+        
+        .provider-direct {
+            background-color: #10B981;
+            color: white;
+        }
+        
+        .provider-other {
+            background-color: #6B7280;
+            color: white;
+        }
     </style>
 </head>
 <body class="min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-4xl">
         <header class="mb-8 text-center">
-            <h1 class="text-3xl font-bold text-primary-600 mb-2">Simplaza MSFS 2020 and 2024</h1>
-            <p class="text-gray-600 dark:text-gray-400">Browse and download addons for Microsoft Flight Simulator 2020 and 2024</p>
+            <h1 class="text-3xl font-bold text-primary-600 mb-2">Simplaza for MSFS 2020 and MSFS 2024</h1>
+            <p class="text-gray-600 dark:text-gray-400">Browse and download addons for Microsoft Flight Simulator</p>
         </header>
 
         <div class="flex justify-between items-center mb-6">
@@ -67,6 +128,9 @@
                 </button>
                 <button id="loginBtn" class="px-4 py-2 border border-primary-600 text-primary-600 rounded hover:bg-primary-100 dark:hover:bg-primary-900 transition-colors">
                     Owner Login
+                </button>
+                <button id="logoutBtn" class="px-4 py-2 border border-red-600 text-red-600 rounded hover:bg-red-100 dark:hover:bg-red-900 transition-colors hidden">
+                    Logout
                 </button>
             </div>
         </div>
@@ -116,8 +180,9 @@
                     <input type="text" id="imageUrl" class="w-full px-3 py-2 text-base border rounded focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Enter image URL (optional)">
                 </div>
                 <div class="mb-6">
-                    <label class="block text-gray-700 dark:text-gray-300 mb-2" for="gdLink">Addon Link</label>
-                    <input type="text" id="gdLink" class="w-full px-3 py-2 text-base border rounded focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Enter Google Drive link">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2" for="downloadLink">Download Link</label>
+                    <input type="text" id="downloadLink" class="w-full px-3 py-2 text-base border rounded focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Enter download link (Google Drive, Dropbox, OneDrive, etc.)">
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Supports Google Drive, Dropbox, OneDrive, Mega, MediaFire, ModsFire, and direct links</p>
                 </div>
                 <div id="addAddonError" class="mb-4 text-red-500 hidden">Error adding addon</div>
                 <div class="flex justify-between">
@@ -126,6 +191,36 @@
                     </button>
                     <button id="submitAddAddon" class="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors">
                         Add Addon
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Addon Modal -->
+        <div id="editAddonModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 opacity-0 pointer-events-none">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+                <h3 class="text-xl font-bold mb-4 text-gray-900 dark:text-white">Edit Addon</h3>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2" for="editAddonTitle">Addon Title</label>
+                    <input type="text" id="editAddonTitle" class="w-full px-3 py-2 text-base border rounded focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Enter addon title">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2" for="editImageUrl">Image URL</label>
+                    <input type="text" id="editImageUrl" class="w-full px-3 py-2 text-base border rounded focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Enter image URL (optional)">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 dark:text-gray-300 mb-2" for="editDownloadLink">Download Link</label>
+                    <input type="text" id="editDownloadLink" class="w-full px-3 py-2 text-base border rounded focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Enter download link (Google Drive, Dropbox, OneDrive, etc.)">
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Supports Google Drive, Dropbox, OneDrive, Mega, MediaFire, ModsFire, and direct links</p>
+                </div>
+                <input type="hidden" id="editAddonOriginalTitle" value="">
+                <div id="editAddonError" class="mb-4 text-red-500 hidden">Error updating addon</div>
+                <div class="flex justify-between">
+                    <button id="cancelEditAddon" class="px-4 py-2 border border-gray-300 text-gray-700 dark:border-gray-600 dark:text-gray-300 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        Cancel
+                    </button>
+                    <button id="submitEditAddon" class="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors">
+                        Update Addon
                     </button>
                 </div>
             </div>
@@ -168,50 +263,102 @@
         };
 
         // API URL - update this to your server URL when deploying
-        const API_URL = 'https://simplaza.onrender.com/api';
+        const API_URL = 'http://localhost:3000/api';
         
-        // Track installed addons
+        // Track installed addons and auth state
         let installedAddons = [];
+        let isLoggedIn = false;
 
-        // Generate a placeholder image if no URL is provided
-        const generatePlaceholderImage = (title) => {
-            const canvas = document.createElement('canvas');
-            canvas.width = 200;
-            canvas.height = 200;
-            const ctx = canvas.getContext('2d');
+        // Link Provider Utility
+        const LinkProvider = {
+            GOOGLE_DRIVE: 'google-drive',
+            DROPBOX: 'dropbox',
+            ONEDRIVE: 'onedrive',
+            MEGA: 'mega',
+            MEDIAFIRE: 'mediafire',
+            MODSFIRE: 'modsfire',
+            DIRECT: 'direct',
+            OTHER: 'other',
             
-            // Background
-            ctx.fillStyle = '#5D5CDE';
-            ctx.fillRect(0, 0, 200, 200);
-            
-            // Text
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 20px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            
-            // Wrap text if too long
-            const words = title.split(' ');
-            let line = '';
-            let y = 100;
-            const lineHeight = 24;
-            let lines = 0;
-            
-            for (let i = 0; i < words.length; i++) {
-                const testLine = line + words[i] + ' ';
-                const metrics = ctx.measureText(testLine);
+            // Detect the provider from a link
+            detect: function(link) {
+                if (!link) return this.OTHER;
                 
-                if (metrics.width > 180 && i > 0) {
-                    ctx.fillText(line, 100, y - (lineHeight * (lines - 1)));
-                    line = words[i] + ' ';
-                    lines++;
+                // Convert to lowercase for easier matching
+                const lowerLink = link.toLowerCase();
+                
+                if (lowerLink.includes('drive.google.com') || lowerLink.includes('docs.google.com')) {
+                    return this.GOOGLE_DRIVE;
+                } else if (lowerLink.includes('dropbox.com')) {
+                    return this.DROPBOX;
+                } else if (lowerLink.includes('onedrive.live.com') || lowerLink.includes('1drv.ms')) {
+                    return this.ONEDRIVE;
+                } else if (lowerLink.includes('mega.nz') || lowerLink.includes('mega.co.nz')) {
+                    return this.MEGA;
+                } else if (lowerLink.includes('mediafire.com')) {
+                    return this.MEDIAFIRE;
+                } else if (lowerLink.includes('modsfire.com')) {
+                    return this.MODSFIRE;
+                } else if (lowerLink.startsWith('http') && (lowerLink.endsWith('.zip') || lowerLink.endsWith('.rar') || lowerLink.endsWith('.7z'))) {
+                    return this.DIRECT;
                 } else {
-                    line = testLine;
+                    return this.OTHER;
+                }
+            },
+            
+            // Get display name for the provider
+            getDisplayName: function(provider) {
+                switch(provider) {
+                    case this.GOOGLE_DRIVE: return 'Google Drive';
+                    case this.DROPBOX: return 'Dropbox';
+                    case this.ONEDRIVE: return 'OneDrive';
+                    case this.MEGA: return 'MEGA';
+                    case this.MEDIAFIRE: return 'MediaFire';
+                    case this.MODSFIRE: return 'ModsFire';
+                    case this.DIRECT: return 'Direct Link';
+                    default: return 'Other';
+                }
+            },
+            
+            // Create HTML badge for the provider
+            createBadge: function(provider) {
+                return `<span class="provider-badge provider-${provider}">${this.getDisplayName(provider)}</span>`;
+            },
+            
+            // Get direct download URL if possible
+            getDownloadUrl: function(link, provider) {
+                switch(provider) {
+                    case this.GOOGLE_DRIVE:
+                        // Extract Google Drive file ID
+                        let fileId = '';
+                        if (link.includes('/file/d/')) {
+                            fileId = link.split('/file/d/')[1].split('/')[0];
+                        } else if (link.includes('id=')) {
+                            fileId = link.split('id=')[1].split('&')[0];
+                        }
+                        return fileId ? `https://drive.google.com/uc?export=download&id=${fileId}` : link;
+                        
+                    case this.DROPBOX:
+                        // Convert dropbox sharing link to direct download
+                        return link.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace('?dl=0', '').replace('?dl=1', '');
+                        
+                    case this.ONEDRIVE:
+                        // For OneDrive, we can't reliably create a direct download link
+                        // Just return the original link and it will open in the browser
+                        return link;
+                        
+                    case this.MEGA:
+                    case this.MEDIAFIRE:
+                    case this.MODSFIRE:
+                        // These services require visiting the site
+                        return link;
+                        
+                    case this.DIRECT:
+                    default:
+                        // For direct links or unknown providers, return as is
+                        return link;
                 }
             }
-            ctx.fillText(line, 100, y + (lineHeight * lines));
-            
-            return canvas.toDataURL();
         };
 
         // UI Elements
@@ -219,21 +366,38 @@
             addonContainer: document.getElementById('addonContainer'),
             noAddonsMessage: document.getElementById('noAddonsMessage'),
             loginBtn: document.getElementById('loginBtn'),
+            logoutBtn: document.getElementById('logoutBtn'),
             refreshBtn: document.getElementById('refreshBtn'),
             loginModal: document.getElementById('loginModal'),
             addAddonModal: document.getElementById('addAddonModal'),
+            editAddonModal: document.getElementById('editAddonModal'),
             statusModal: document.getElementById('statusModal'),
+            
+            // Login form
             username: document.getElementById('username'),
             password: document.getElementById('password'),
             submitLogin: document.getElementById('submitLogin'),
             cancelLogin: document.getElementById('cancelLogin'),
             loginError: document.getElementById('loginError'),
+            
+            // Add addon form
             addonTitle: document.getElementById('addonTitle'),
             imageUrl: document.getElementById('imageUrl'),
-            gdLink: document.getElementById('gdLink'),
+            downloadLink: document.getElementById('downloadLink'),
             submitAddAddon: document.getElementById('submitAddAddon'),
             cancelAddAddon: document.getElementById('cancelAddAddon'),
             addAddonError: document.getElementById('addAddonError'),
+            
+            // Edit addon form
+            editAddonTitle: document.getElementById('editAddonTitle'),
+            editImageUrl: document.getElementById('editImageUrl'),
+            editDownloadLink: document.getElementById('editDownloadLink'),
+            editAddonOriginalTitle: document.getElementById('editAddonOriginalTitle'),
+            submitEditAddon: document.getElementById('submitEditAddon'),
+            cancelEditAddon: document.getElementById('cancelEditAddon'),
+            editAddonError: document.getElementById('editAddonError'),
+            
+            // Status modal
             statusMessage: document.getElementById('statusMessage'),
             progressBar: document.getElementById('progressBar'),
             closeStatus: document.getElementById('closeStatus')
@@ -286,6 +450,50 @@
             }
         };
 
+        // Update an existing addon
+        const updateAddon = async (originalTitle, newTitle, newImage, newLink) => {
+            try {
+                const response = await fetch(`${API_URL}/addons/${encodeURIComponent(originalTitle)}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: newTitle,
+                        image: newImage,
+                        link: newLink
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to update addon');
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error updating addon:', error);
+                throw error;
+            }
+        };
+
+        // Delete an addon
+        const deleteAddon = async (title) => {
+            try {
+                const response = await fetch(`${API_URL}/addons/${encodeURIComponent(title)}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to delete addon');
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error deleting addon:', error);
+                throw error;
+            }
+        };
+
         // Owner login
         const ownerLogin = async (username, password) => {
             try {
@@ -304,156 +512,257 @@
             }
         };
 
-        // Display Addons
+        // Create text placeholder instead of canvas-generated image
+        const createTextPlaceholder = (title) => {
+            // Get first letter of each word for the placeholder
+            const initials = title
+                .split(' ')
+                .map(word => word.charAt(0))
+                .join('')
+                .toUpperCase()
+                .substring(0, 3);
+            
+            return `<div class="placeholder-image">${initials}</div>`;
+        };
+
         // Display Addons
         const displayAddons = async () => {
             const addons = await fetchAddons();
             elements.addonContainer.innerHTML = '';
-
+            
             if (addons.length === 0) {
                 elements.noAddonsMessage.classList.remove('hidden');
             } else {
                 elements.noAddonsMessage.classList.add('hidden');
-
+                
                 addons.forEach(addon => {
+                    // Create addon card
                     const card = document.createElement('div');
                     card.className = 'addon-card bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex flex-col md:flex-row items-center';
-
-                    // Use provided image URL or generate placeholder
-                    let imgSrc = addon.image;
-
-                    if (!imgSrc) {
-                        imgSrc = generatePlaceholderImage(addon.title);
-                    }
-
-                    // Create an img element directly
-                    const imgElement = document.createElement('img');
-                    imgElement.src = imgSrc;
-                    imgElement.alt = addon.title;
-                    imgElement.className = 'w-full h-full object-cover rounded';
-
+                    
                     // Check if addon is installed
                     const isInstalled = installedAddons.includes(addon.title);
-
+                    
+                    // Detect link provider
+                    const provider = LinkProvider.detect(addon.link);
+                    
+                    // Create the image element or placeholder
+                    let imageHtml;
+                    if (addon.image) {
+                        imageHtml = `
+                            <img 
+                                src="${addon.image}" 
+                                alt="${addon.title}" 
+                                class="w-full h-full object-cover rounded"
+                                onerror="this.onerror=null; this.parentNode.innerHTML='${createTextPlaceholder(addon.title)}';"
+                            >`;
+                    } else {
+                        imageHtml = createTextPlaceholder(addon.title);
+                    }
+                    
+                    // Owner controls (only shown when logged in)
+                    const ownerControlsHtml = isLoggedIn ? `
+                        <div class="flex space-x-2 mt-2">
+                            <button class="edit-btn px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors text-sm"
+                                data-title="${addon.title}" 
+                                data-image="${addon.image || ''}" 
+                                data-link="${addon.link}">
+                                Edit
+                            </button>
+                            <button class="delete-btn px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
+                                data-title="${addon.title}">
+                                Delete
+                            </button>
+                        </div>
+                    ` : '';
+                    
                     card.innerHTML = `
                         <div class="flex-shrink-0 w-20 h-20 mb-4 md:mb-0 md:mr-4">
-                            </div>
+                            ${imageHtml}
+                        </div>
                         <div class="flex-grow md:mr-4">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">${addon.title}</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                ${addon.title}
+                                ${LinkProvider.createBadge(provider)}
+                            </h3>
                             <div class="flex items-center mt-2">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isInstalled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
                                     ${isInstalled ? '✓ Installed' : '✗ Not Installed'}
                                 </span>
                             </div>
+                            ${ownerControlsHtml}
                         </div>
                         <div class="mt-4 md:mt-0">
-                            <button class="download-btn px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors" data-link="${addon.link}" data-title="${addon.title}">
+                            <button class="download-btn px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 transition-colors" 
+                                data-link="${addon.link}" 
+                                data-title="${addon.title}"
+                                data-provider="${provider}">
                                 Download
                             </button>
                         </div>
                     `;
-                    // Append the imgElement to the card directly.
-                    card.querySelector('.flex-shrink-0').appendChild(imgElement);
-
+                    
                     elements.addonContainer.appendChild(card);
                 });
-
+                
+                // Add event listeners to buttons
                 document.querySelectorAll('.download-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const link = e.target.dataset.link;
                         const title = e.target.dataset.title;
-                        downloadAddon(link, title);
+                        const provider = e.target.dataset.provider;
+                        handleDownload(link, title, provider);
                     });
                 });
+                
+                // Add edit button event listeners (only when logged in)
+                if (isLoggedIn) {
+                    document.querySelectorAll('.edit-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const title = e.target.dataset.title;
+                            const image = e.target.dataset.image;
+                            const link = e.target.dataset.link;
+                            openEditModal(title, image, link);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.delete-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const title = e.target.dataset.title;
+                            if (confirm(`Are you sure you want to delete "${title}"?`)) {
+                                deleteAddonAndRefresh(title);
+                            }
+                        });
+                    });
+                }
             }
         };
 
-        // Handle download (modified to support various link types)
-        const downloadAddon = (link, title) => {
+        // Open Edit Modal
+        const openEditModal = (title, image, link) => {
+            elements.editAddonTitle.value = title;
+            elements.editImageUrl.value = image;
+            elements.editDownloadLink.value = link;
+            elements.editAddonOriginalTitle.value = title;
+            elements.editAddonError.classList.add('hidden');
+            showModal(elements.editAddonModal);
+        };
+
+        // Delete addon and refresh the list
+        const deleteAddonAndRefresh = async (title) => {
+            try {
+                await deleteAddon(title);
+                await displayAddons();
+            } catch (error) {
+                alert(`Error deleting addon: ${error.message}`);
+            }
+        };
+
+        // Handle download based on provider
+        const handleDownload = (link, title, provider) => {
             showModal(elements.statusModal);
             elements.statusMessage.textContent = `Preparing to download ${title}...`;
             elements.progressBar.style.width = '0%';
-
-            let downloadUrl = link; // Default to the provided link
-
-            // Check if the link is a Google Drive link
-            if (link.includes('drive.google.com')) {
-                let fileId = '';
-                try {
-                    if (link.includes('/file/d/')) {
-                        fileId = link.split('/file/d/')[1].split('/')[0];
-                    } else if (link.includes('id=')) {
-                        fileId = link.split('id=')[1].split('&')[0];
-                    } else {
-                        throw new Error('Invalid Google Drive link format');
+            
+            try {
+                const providerName = LinkProvider.getDisplayName(provider);
+                const downloadUrl = LinkProvider.getDownloadUrl(link, provider);
+                
+                // Create a hidden anchor element for the download
+                const downloadLink = document.createElement('a');
+                downloadLink.href = downloadUrl;
+                downloadLink.download = `${title}.zip`; // Assume zip format for MSFS addons
+                downloadLink.target = "_blank";
+                downloadLink.rel = "noopener noreferrer";
+                
+                // For providers that need special handling
+                let downloadInstruction = '';
+                if (provider === LinkProvider.MEGA || provider === LinkProvider.MEDIAFIRE || 
+                    provider === LinkProvider.ONEDRIVE || provider === LinkProvider.MODSFIRE) {
+                    downloadInstruction = `
+                        <p class="mb-4">This link will open the ${providerName} website.</p>
+                        <p class="mb-4">Follow the instructions on the website to download the addon.</p>
+                    `;
+                }
+                
+                elements.statusMessage.innerHTML = `
+                    <div class="text-center">
+                        <p class="mb-4">Ready to download ${title} from ${providerName}.</p>
+                        ${downloadInstruction}
+                        <div id="downloadLinkContainer" class="py-2"></div>
+                        <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                            Note: After downloading, you'll need to extract the zip file to your MSFS Community folder.
+                        </p>
+                    </div>
+                `;
+                
+                // Add the download button to the modal
+                const container = document.getElementById('downloadLinkContainer');
+                const downloadButton = document.createElement('button');
+                downloadButton.className = "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors";
+                downloadButton.textContent = "Download Now";
+                downloadButton.addEventListener('click', () => {
+                    // Trigger the download
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    
+                    // Update status
+                    elements.statusMessage.textContent = `Download started for ${title}!`;
+                    
+                    // Add to installed addons
+                    if (!installedAddons.includes(title)) {
+                        installedAddons.push(title);
+                        // Save installed addons to localStorage
+                        try {
+                            localStorage.setItem('installedAddons', JSON.stringify(installedAddons));
+                        } catch (err) {
+                            console.warn('Could not save to localStorage:', err);
+                        }
                     }
-                    downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-                } catch (error) {
-                    elements.statusMessage.textContent = `Error: ${error.message}`;
-                    elements.progressBar.style.width = '0%';
-                    console.error('Download error:', error);
+                    
+                    // Update UI
+                    elements.progressBar.style.width = '100%';
+                    
+                    // Close modal after a delay
                     setTimeout(() => {
-                        elements.statusMessage.innerHTML += `
-                            <div class="mt-4">
-                                <button class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors" onclick="document.getElementById('closeStatus').click()">
-                                    Close
-                                </button>
-                            </div>
-                        `;
-                    }, 1000);
-                    return; // Exit early if Google Drive link is invalid
-                }
-            }
-            // Create a hidden anchor element for the download
-            const downloadLink = document.createElement('a');
-            downloadLink.href = downloadUrl;
-            downloadLink.download = `${title}.zip`; // Assume zip format for MSFS addons
-            downloadLink.target = "_blank";
-            downloadLink.rel = "noopener noreferrer";
-            downloadLink.textContent = "Download";
-
-            elements.statusMessage.innerHTML = `
-                <div class="text-center">
-                    <p class="mb-4">Ready to download ${title}.</p>
-                    <p class="mb-4">Click the button below to start the download:</p>
-                    <div id="downloadLinkContainer" class="py-2"></div>
-                    <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
-                        Note: After downloading, you'll need to extract the zip file to your MSFS Community folder.
-                    </p>
-                </div>
-            `;
-
-            const container = document.getElementById('downloadLinkContainer');
-            const downloadButton = document.createElement('button');
-            downloadButton.className = "px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors";
-            downloadButton.textContent = "Download Now";
-            downloadButton.addEventListener('click', () => {
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-
-                elements.statusMessage.textContent = `Download started for ${title}!`;
-
-                if (!installedAddons.includes(title)) {
-                    installedAddons.push(title);
-                    try {
-                        localStorage.setItem('installedAddons', JSON.stringify(installedAddons));
-                    } catch (err) {
-                        console.warn('Could not save to localStorage:', err);
-                    }
-                }
-
-                elements.progressBar.style.width = '100%';
-
+                        hideModal(elements.statusModal);
+                        displayAddons();
+                    }, 3000);
+                });
+                
+                container.appendChild(downloadButton);
+                
+            } catch (error) {
+                elements.statusMessage.textContent = `Error: ${error.message}`;
+                elements.progressBar.style.width = '0%';
+                console.error('Download error:', error);
+                
+                // Add a close button in error state
                 setTimeout(() => {
-                    hideModal(elements.statusModal);
-                    displayAddons();
-                }, 3000);
-            });
-
-            container.appendChild(downloadButton);
-
+                    elements.statusMessage.innerHTML += `
+                        <div class="mt-4">
+                            <button class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors" onclick="document.getElementById('closeStatus').click()">
+                                Close
+                            </button>
+                        </div>
+                    `;
+                }, 1000);
+            }
         };
+
+        // Update the UI based on login state
+        const updateUIForLoginState = () => {
+            if (isLoggedIn) {
+                elements.loginBtn.classList.add('hidden');
+                elements.logoutBtn.classList.remove('hidden');
+            } else {
+                elements.loginBtn.classList.remove('hidden');
+                elements.logoutBtn.classList.add('hidden');
+            }
+            displayAddons();
+        };
+
         // Event Listeners
         elements.loginBtn.addEventListener('click', () => {
             // Reset login form
@@ -461,6 +770,11 @@
             elements.password.value = '';
             elements.loginError.classList.add('hidden');
             showModal(elements.loginModal);
+        });
+
+        elements.logoutBtn.addEventListener('click', () => {
+            isLoggedIn = false;
+            updateUIForLoginState();
         });
 
         elements.cancelLogin.addEventListener('click', () => {
@@ -478,8 +792,9 @@
                 const result = await ownerLogin(username, password);
                 
                 if (result.success) {
+                    isLoggedIn = true;
                     hideModal(elements.loginModal);
-                    showModal(elements.addAddonModal);
+                    updateUIForLoginState();
                     elements.loginError.classList.add('hidden');
                 } else {
                     elements.loginError.textContent = result.error || 'Invalid credentials';
@@ -494,6 +809,18 @@
             }
         });
 
+        // Add Addon Modal
+        document.getElementById('loginBtn').addEventListener('dblclick', () => {
+            if (isLoggedIn) {
+                // Reset form
+                elements.addonTitle.value = '';
+                elements.imageUrl.value = '';
+                elements.downloadLink.value = '';
+                elements.addAddonError.classList.add('hidden');
+                showModal(elements.addAddonModal);
+            }
+        });
+
         elements.cancelAddAddon.addEventListener('click', () => {
             hideModal(elements.addAddonModal);
         });
@@ -501,10 +828,10 @@
         elements.submitAddAddon.addEventListener('click', async () => {
             const title = elements.addonTitle.value.trim();
             const image = elements.imageUrl.value.trim();
-            const link = elements.gdLink.value.trim();
+            const link = elements.downloadLink.value.trim();
             
             if (!title || !link) {
-                elements.addAddonError.textContent = 'Title and Google Drive Link are required!';
+                elements.addAddonError.textContent = 'Title and download link are required!';
                 elements.addAddonError.classList.remove('hidden');
                 return;
             }
@@ -519,7 +846,7 @@
                 // Reset form and hide modal
                 elements.addonTitle.value = '';
                 elements.imageUrl.value = '';
-                elements.gdLink.value = '';
+                elements.downloadLink.value = '';
                 hideModal(elements.addAddonModal);
                 
                 // Refresh UI
@@ -530,6 +857,55 @@
             } finally {
                 elements.submitAddAddon.disabled = false;
                 elements.submitAddAddon.textContent = 'Add Addon';
+            }
+        });
+
+        // Edit Addon Modal
+        elements.cancelEditAddon.addEventListener('click', () => {
+            hideModal(elements.editAddonModal);
+        });
+
+        elements.submitEditAddon.addEventListener('click', async () => {
+            const originalTitle = elements.editAddonOriginalTitle.value;
+            const newTitle = elements.editAddonTitle.value.trim();
+            const newImage = elements.editImageUrl.value.trim();
+            const newLink = elements.editDownloadLink.value.trim();
+            
+            if (!newTitle || !newLink) {
+                elements.editAddonError.textContent = 'Title and download link are required!';
+                elements.editAddonError.classList.remove('hidden');
+                return;
+            }
+            
+            elements.submitEditAddon.disabled = true;
+            elements.submitEditAddon.textContent = 'Updating...';
+            elements.editAddonError.classList.add('hidden');
+            
+            try {
+                await updateAddon(originalTitle, newTitle, newImage, newLink);
+                
+                // Update installed addons list if the title changed
+                if (originalTitle !== newTitle && installedAddons.includes(originalTitle)) {
+                    const index = installedAddons.indexOf(originalTitle);
+                    installedAddons[index] = newTitle;
+                    try {
+                        localStorage.setItem('installedAddons', JSON.stringify(installedAddons));
+                    } catch (err) {
+                        console.warn('Could not update localStorage:', err);
+                    }
+                }
+                
+                // Hide modal
+                hideModal(elements.editAddonModal);
+                
+                // Refresh UI
+                await displayAddons();
+            } catch (error) {
+                elements.editAddonError.textContent = 'Failed to update addon: ' + error.message;
+                elements.editAddonError.classList.remove('hidden');
+            } finally {
+                elements.submitEditAddon.disabled = false;
+                elements.submitEditAddon.textContent = 'Update Addon';
             }
         });
 
@@ -557,7 +933,7 @@
         // Initialize the app
         document.addEventListener('DOMContentLoaded', () => {
             loadInstalledAddons();
-            displayAddons();
+            updateUIForLoginState();
         });
     </script>
 </body>

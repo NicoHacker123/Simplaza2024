@@ -15,7 +15,15 @@ app.use(express.static('public'));
 
 // Initialize addons file if it doesn't exist
 if (!fs.existsSync(ADDONS_FILE)) {
-  fs.writeFileSync(ADDONS_FILE, JSON.stringify([], null, 2));
+  // Initialize with the IniBuilds A350 preset
+  const initialAddons = [
+    { 
+      title: "IniBuilds A350 2020 1.0.0", 
+      image: "https://i.imgur.com/nKLOEQk.jpg", 
+      link: "https://drive.google.com/file/d/1Hft9rRQQXw7TZoGzZsOX_uF-1pJd6eiG/view" 
+    }
+  ];
+  fs.writeFileSync(ADDONS_FILE, JSON.stringify(initialAddons, null, 2));
 }
 
 // Helper function to read addons
@@ -75,12 +83,44 @@ app.post('/api/addons', (req, res) => {
   }
 });
 
+// Update an existing addon
+app.put('/api/addons/:title', (req, res) => {
+  const originalTitle = decodeURIComponent(req.params.title);
+  const { title, image, link } = req.body;
+  
+  if (!title || !link) {
+    return res.status(400).json({ error: 'Title and link are required' });
+  }
+  
+  const addons = readAddons();
+  
+  // Find the addon to update
+  const addonIndex = addons.findIndex(addon => addon.title === originalTitle);
+  
+  if (addonIndex === -1) {
+    return res.status(404).json({ error: 'Addon not found' });
+  }
+  
+  // Update the addon
+  addons[addonIndex] = { title, image, link };
+  
+  if (writeAddons(addons)) {
+    res.json({ 
+      message: 'Addon updated successfully', 
+      addon: { title, image, link } 
+    });
+  } else {
+    res.status(500).json({ error: 'Failed to update addon' });
+  }
+});
+
 // Delete an addon
 app.delete('/api/addons/:title', (req, res) => {
   const { title } = req.params;
+  const decodedTitle = decodeURIComponent(title);
   const addons = readAddons();
   
-  const filteredAddons = addons.filter(addon => addon.title.toLowerCase() !== title.toLowerCase());
+  const filteredAddons = addons.filter(addon => addon.title !== decodedTitle);
   
   if (filteredAddons.length < addons.length) {
     if (writeAddons(filteredAddons)) {
@@ -94,12 +134,10 @@ app.delete('/api/addons/:title', (req, res) => {
 });
 
 // Basic authentication for owner access
-// Note: In a production environment, you would use a more secure authentication system
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   
   // Hardcoded credentials for simplicity
-  // In a real application, you would use a database and proper password hashing
   if (username === 'admin' && password === '123') {
     res.json({ success: true });
   } else {
